@@ -1,4 +1,4 @@
-const tmi = require('../index.js');
+const tmi = require('../');
 
 const tests = [
 	'FOO',
@@ -11,7 +11,7 @@ const tests = [
 describe('invalid server events', () => {
 	tests.forEach(test => {
 		it(`treat "${test}" as invalid`, () => {
-			const client = new tmi.client({
+			const client = new tmi.Client({
 				logger: {
 					warn(message) {
 						message.includes('Could not parse').should.be.ok;

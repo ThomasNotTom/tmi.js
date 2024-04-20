@@ -23,16 +23,12 @@ $ npm i tmi.js
 ```js
 const tmi = require('tmi.js');
 const client = new tmi.Client({
-	options: { debug: true, messagesLogLevel: "info" },
-	connection: {
-		reconnect: true,
-		secure: true
-	},
+	options: { debug: true },
 	identity: {
-		username: 'bot-name',
-		password: 'oauth:my-bot-token'
+		username: 'bot_name',
+		password: 'oauth:my_bot_token'
 	},
-	channels: [ 'my-channel' ]
+	channels: [ 'my_channel' ]
 });
 client.connect().catch(console.error);
 client.on('message', (channel, tags, message, self) => {
@@ -89,4 +85,4 @@ Thanks to all of the tmi.js [contributors](https://github.com/tmijs/tmi.js/graph
 
 ## Contributing guidelines
 
-Please review the [guidelines for contributing](https://github.com/tmijs/tmi.js/blob/master/CONTRIBUTING.md) of the [tmi.js repository](https://github.com/tmijs/tmi.js). We reserve the right to refuse a Pull Request if it does not meet the requirements.
+Please review the [guidelines for contributing](https://github.com/tmijs/tmi.js/blob/main/CONTRIBUTING.md) of the [tmi.js repository](https://github.com/tmijs/tmi.js). We reserve the right to refuse a Pull Request if it does not meet the requirements.

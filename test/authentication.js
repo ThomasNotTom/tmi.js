@@ -1,5 +1,5 @@
 const WebSocketServer = require('ws').Server;
-const tmi = require('../index.js');
+const tmi = require('../');
 
 const noop = function() {};
 const catchConnectError = err => {
@@ -18,7 +18,7 @@ describe('handling authentication', () => {
 	beforeEach(function() {
 		// Initialize websocket server
 		this.server = new WebSocketServer({ port: 7000 });
-		this.client = new tmi.client({
+		this.client = new tmi.Client({
 			logger: {
 				error: noop,
 				info: noop

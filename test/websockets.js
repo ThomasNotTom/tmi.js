@@ -1,5 +1,5 @@
 const WebSocketServer = require('ws').Server;
-const tmi = require('../index.js');
+const tmi = require('../');
 
 const catchConnectError = err => {
 	if(err !== 'Connection closed.') {
@@ -11,7 +11,7 @@ describe('websockets', () => {
 	before(function() {
 		// Initialize websocket server
 		this.server = new WebSocketServer({ port: 7000 });
-		this.client = new tmi.client({
+		this.client = new tmi.Client({
 			connection: {
 				server: 'localhost',
 				port: 7000
@@ -57,12 +57,13 @@ describe('server crashed, with reconnect: true (default)', () => {
 	before(function() {
 		// Initialize websocket server
 		this.server = new WebSocketServer({ port: 7000 });
-		this.client = new tmi.client({
+		this.client = new tmi.Client({
 			connection: {
 				server: 'localhost',
 				port: 7000
 			}
 		});
+		this.client.log.setLevel('fatal');
 	});
 
 	it('attempt to reconnect', function(cb) {
@@ -72,14 +73,17 @@ describe('server crashed, with reconnect: true (default)', () => {
 		server.on('connection', _ws => {
 			// Uh-oh, the server dies
 			server.close();
+			_ws.terminate();
 		});
 
-		client.on('disconnected', () => {
+		const listener = () => {
 			setTimeout(() => {
 				'Test that we reached this point'.should.be.ok();
 				cb();
+				client.removeListener('disconnected', listener);
 			}, client.reconnectTimer);
-		});
+		};
+		client.on('disconnected', listener);
 
 		client.connect().catch(catchConnectError);
 	});
@@ -89,7 +93,7 @@ describe('server crashed, with reconnect: false', () => {
 	before(function() {
 		// Initialize websocket server
 		this.server = new WebSocketServer({ port: 7000 });
-		this.client = new tmi.client({
+		this.client = new tmi.Client({
 			connection: {
 				server: 'localhost',
 				port: 7000,
@@ -105,12 +109,15 @@ describe('server crashed, with reconnect: false', () => {
 		server.on('connection', _ws => {
 			// Uh-oh, the server dies
 			server.close();
+			_ws.terminate();
 		});
 
-		client.on('disconnected', () => {
+		const listener = () => {
 			'Test that we reached this point'.should.be.ok();
 			cb();
-		});
+			client.removeListener('disconnected', listener);
+		};
+		client.on('disconnected', listener);
 
 		client.connect().catch(catchConnectError);
 	});

@@ -1,5 +1,5 @@
 const WebSocketServer = require('ws').Server;
-const tmi = require('../index.js');
+const tmi = require('../');
 
 const noop = function() {};
 const catchConnectError = err => {
@@ -408,7 +408,7 @@ describe('commands (justinfan)', () => {
 	beforeEach(function() {
 		// Initialize websocket server
 		this.server = new WebSocketServer({ port: 7000 });
-		this.client = new tmi.client({
+		this.client = new tmi.Client({
 			connection: {
 				server: 'localhost',
 				port: 7000,
@@ -416,6 +416,7 @@ describe('commands (justinfan)', () => {
 				reconnect: false
 			}
 		});
+		this.client.log.setLevel('fatal');
 	});
 
 	afterEach(function() {
@@ -574,7 +575,7 @@ describe('commands (identity)', () => {
 	beforeEach(function() {
 		// Initialize websocket server
 		this.server = new WebSocketServer({ port: 7000 });
-		this.client = new tmi.client({
+		this.client = new tmi.Client({
 			connection: {
 				server: 'localhost',
 				port: 7000
@@ -646,11 +647,12 @@ describe('commands (identity)', () => {
 
 	it('should break up long messages (> 500 characters)', function(cb) {
 		const { client, server } = this;
-		const lorem = 'lorem '.repeat(89) + 'ipsum';
+		const lorem = `${'lorem '.repeat(89)}ipsum`;
 		let calls = 0;
 
 		server.on('connection', ws => {
 			ws.on('message', message => {
+				message = message.toString();
 				if(~message.indexOf('PRIVMSG')) {
 					ws.send(`:tmi.twitch.tv PRIVMSG #local7000 :${message.split(':')[1]}`);
 				}
@@ -675,11 +677,12 @@ describe('commands (identity)', () => {
 
 	it('should break up long messages without spaces (> 500 characters)', function(cb) {
 		const { client, server } = this;
-		const lorem = 'lorem'.repeat(100) + 'ipsum';
+		const lorem = `${'lorem'.repeat(100)}ipsum`;
 		let calls = 0;
 
 		server.on('connection', ws => {
 			ws.on('message', message => {
+				message = message.toString();
 				if(~message.indexOf('PRIVMSG')) {
 					ws.send(`:tmi.twitch.tv PRIVMSG #local7000 :${message.split(':')[1]}`);
 				}
